@@ -22,5 +22,25 @@ class UserSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        DB::table('users')->insert([
+            'fullname' => 'Director One',
+            'username' => 'director1',
+            'password' => Hash::make('director1@1234'),
+            'role' => 'Director', // you can specify any role here
+            'address_id' => 1, // sample address_id, adjust as necessary
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'fullname' => 'Shipper One',
+            'username' => 'shipper1',
+            'password' => Hash::make('shipper1@1234'),
+            'role' => 'Shipper', // you can specify any role here
+            'address_id' => 1, // sample address_id, adjust as necessary
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

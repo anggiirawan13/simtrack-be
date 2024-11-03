@@ -13,11 +13,21 @@ class Delivery extends Model
         'delivery_number',
         'company_name',
         'shipper_id',
-        'status_id',
+        'status',
         'delivery_date',
         'receive_date',
         'confirmation_code',
         'created_by',
         'updated_by'
     ];
+
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'delivery_number');
+    }
+
+    public function history()
+    {
+        return $this->hasMany(DeliveryHistoryLocation::class, 'delivery_number');
+    }
 }

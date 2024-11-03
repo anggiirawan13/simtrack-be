@@ -17,7 +17,7 @@ class DeliveryController extends Controller
      */
     public function index()
     {
-        $deliveries = Delivery::latest()->paginate(5);
+        $deliveries = Delivery::all();
 
         return new DeliveryResource(true, 'List Data Deliveries', $deliveries);
     }
@@ -32,12 +32,10 @@ class DeliveryController extends Controller
             'delivery_number' => 'required|string',
             'company_name' => 'required|string',
             'shipper_id' => 'required|integer',
-            'status_id' => 'required|integer',
+            'status' => 'required|integer',
             'delivery_date' => 'required|date',
             'receive_date' => 'nullable|date',
             'confirmation_code' => 'required|string',
-            'details' => 'required|array', // array of delivery details
-            'history_locations' => 'required|array', // array of history locations
         ]);
 
         // Check if validation fails
@@ -50,16 +48,16 @@ class DeliveryController extends Controller
             'delivery_number' => $request->delivery_number,
             'company_name' => $request->company_name,
             'shipper_id' => $request->shipper_id,
-            'status_id' => $request->status_id,
+            'status' => $request->status,
             'delivery_date' => $request->delivery_date,
             'receive_date' => $request->receive_date,
             'confirmation_code' => $request->confirmation_code,
-            'created_by' => $request->created_by, // Assuming user is authenticated
-            'updated_by' => $request->updated_by,
+            'created_by' => 'admin', // Assuming user is authenticated
+            'updated_by' => 'admin',
         ]);
 
-        // Create delivery details
-        foreach ($request->details as $detail) {
+        // Create delivery recipient
+        foreach ($request->recipient as $detail) {
             DeliveryRecipient::create([
                 'delivery_number' => $delivery->delivery_number,
                 'name' => $detail['name'], // Assuming detail has 'name' field
@@ -68,7 +66,7 @@ class DeliveryController extends Controller
         }
 
         // Create delivery history locations
-        foreach ($request->history_locations as $location) {
+        foreach ($request->history as $location) {
             DeliveryHistoryLocation::create([
                 'delivery_number' => $delivery->delivery_number,
                 'latitude' => $location['latitude'],
@@ -100,12 +98,12 @@ class DeliveryController extends Controller
             'delivery_number' => 'required|string',
             'company_name' => 'required|string',
             'shipper_id' => 'required|integer',
-            'status_id' => 'required|integer',
+            'status' => 'required|integer',
             'delivery_date' => 'required|date',
             'receive_date' => 'nullable|date',
             'confirmation_code' => 'required|string',
-            'details' => 'required|array', // array of delivery details
-            'history_locations' => 'required|array', // array of history locations
+            'recipient' => 'required|array', // array of delivery recipient
+            'history' => 'required|array', // array of history locations
         ]);
 
         // Check if validation fails
@@ -118,7 +116,7 @@ class DeliveryController extends Controller
             'delivery_number' => $request->delivery_number,
             'company_name' => $request->company_name,
             'shipper_id' => $request->shipper_id,
-            'status_id' => $request->status_id,
+            'status' => $request->status,
             'delivery_date' => $request->delivery_date,
             'receive_date' => $request->receive_date,
             'confirmation_code' => $request->confirmation_code,
@@ -126,8 +124,8 @@ class DeliveryController extends Controller
             'updated_by' => $request->updated_by,
         ]);
 
-        // Create delivery details
-        foreach ($request->details as $detail) {
+        // Create delivery recipient
+        foreach ($request->recipient as $detail) {
             DeliveryRecipient::create([
                 'delivery_number' => $delivery->delivery_number,
                 'name' => $detail['name'], // Assuming detail has 'name' field
@@ -136,7 +134,7 @@ class DeliveryController extends Controller
         }
 
         // Create delivery history locations
-        foreach ($request->history_locations as $location) {
+        foreach ($request->history as $location) {
             DeliveryHistoryLocation::create([
                 'delivery_number' => $delivery->delivery_number,
                 'latitude' => $location['latitude'],

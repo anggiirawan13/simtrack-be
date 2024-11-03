@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DeliveryController;
 use App\Http\Controllers\Api\ShipperController;
 use App\Http\Controllers\Api\UserController;
@@ -13,3 +14,4 @@ Route::get('/user', function (Request $request) {
 Route::apiResource('/users', UserController::class);
 Route::apiResource('/shippers', ShipperController::class);
 Route::apiResource('/deliveries', DeliveryController::class);
+Route::post('/auth/login', [AuthController::class, 'login']);

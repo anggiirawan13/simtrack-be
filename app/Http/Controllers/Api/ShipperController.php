@@ -15,7 +15,7 @@ class ShipperController extends Controller
      */
     public function index()
     {
-        $shippers = Shipper::latest()->paginate(5);
+        $shippers = Shipper::with('user')->get();
 
         return new ShipperResource(true, 'List Data Shippers', $shippers);
     }

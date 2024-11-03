@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('delivery_number');
             $table->string('company_name');
             $table->integer('shipper_id');
-            $table->integer('status_id');
+            $table->integer('status');
             $table->date('delivery_date');
             $table->date('receive_date')->nullable();
             $table->string('confirmation_code');

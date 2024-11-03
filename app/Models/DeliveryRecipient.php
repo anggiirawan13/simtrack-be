@@ -14,4 +14,9 @@ class DeliveryRecipient extends Model
         'name',
         'address_id'    
     ];
+
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'address_id');
+    }
 }

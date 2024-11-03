@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\Address;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -15,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(5);
+        $users = User::with('address')->get();
 
         return new UserResource(true, 'List Data User', $users);
     }
@@ -26,13 +29,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required',
             'password' => 'required',
             'fullname' => 'required',
             'username' => 'required',
-            'role_id' => 'required',
-            'address_id' => 'required'
         ]);
 
         //check if validation fails
@@ -40,19 +39,26 @@ class UserController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        $address = Address::create([
+            'street' => $request->address['street'],
+            'sub_district' => $request->address['sub_district'],
+            'district' => $request->address['district'],
+            'city' => $request->address['city'],
+            'province' => $request->address['province'],
+            'postal_code' => $request->address['postal_code'],
+        ]);
+
         //create user
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
             'password' => $request->password,
             'fullname' => $request->fullname,
             'username' => $request->username,
-            'role_id' => $request->role_id,
-            'address_id' => $request->address_id
+            'role' => $request->role,
+            'address_id' => $address->id,
         ]);
 
         //return response
-        return new UserResource(true, 'Data User Berhasil Ditambahkan!', $user);
+        return new UserResource(true, 'Data User Berhasil Ditambahkan!', null);
     }
 
     /**
@@ -60,7 +66,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::with('address')->find($id);
 
         return new UserResource(true, 'Detail Data User!', $user);
     }
@@ -70,55 +76,53 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //define validation rules
+        // Define validation rules
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
+            'password' => 'nullable', // Allow password to be null
             'fullname' => 'required',
             'username' => 'required',
-            'role_id' => 'required',
-            'address_id' => 'required'
         ]);
 
-        //check if validation fails
+        // Check if validation fails
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        //find user by ID
+        // Find user by ID
         $user = User::find($id);
+        $address = Address::find($user->address_id);
 
-        //check if image is not empty
-        if ($request->hasFile('image')) {
+        // Update address fields
+        $address->update([
+            'street' => $request->address['street'],
+            'sub_district' => $request->address['sub_district'],
+            'district' => $request->address['district'],
+            'city' => $request->address['city'],
+            'province' => $request->address['province'],
+            'postal_code' => $request->address['postal_code'],
+        ]);
 
-            //update user with new image
-            $user->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => $request->password,
-                'fullname' => $request->fullname,
-                'username' => $request->username,
-                'role_id' => $request->role_id,
-                'address_id' => $request->address_id
-            ]);
-        } else {
+        // Prepare data for user update
+        $userData = [
+            'id' => $id,
+            'fullname' => $request->fullname,
+            'username' => $request->username,
+            'role' => $request->role,
+            'address_id' => $address->id,
+        ];
 
-            //update user without image
-            $user->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => $request->password,
-                'fullname' => $request->fullname,
-                'username' => $request->username,
-                'role_id' => $request->role_id,
-                'address_id' => $request->address_id
-            ]);
+        // Update password only if provided
+        if ($request->filled('password') && !Hash::check($request->password, $user->password)) {
+            $userData['password'] = Hash::make($request->password); // Hash password before saving
         }
 
-        //return response
+        // Update user
+        $user->update($userData);
+
+        // Return response
         return new UserResource(true, 'Data User Berhasil Diubah!', $user);
     }
+
 
     /**
      * Remove the specified resource from storage.

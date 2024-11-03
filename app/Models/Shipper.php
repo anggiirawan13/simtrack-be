@@ -13,4 +13,14 @@ class Shipper extends Model
         'user_id',
         'device_mapping'
     ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

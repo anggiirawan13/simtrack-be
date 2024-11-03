@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DeliveryResource;
+use App\Models\Address;
 use App\Models\Delivery;
 use App\Models\DeliveryRecipient;
 use App\Models\DeliveryHistoryLocation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
@@ -32,10 +34,10 @@ class DeliveryController extends Controller
             'delivery_number' => 'required|string',
             'company_name' => 'required|string',
             'shipper_id' => 'required|integer',
-            'status' => 'required|integer',
-            'delivery_date' => 'required|date',
-            'receive_date' => 'nullable|date',
-            'confirmation_code' => 'required|string',
+            'status' => 'required|string',
+            'delivery_date' => 'required', // Adjusting to match yyyy-MM-dd format
+            'receive_date' => 'nullable', // Adjusting to match yyyy-MM-dd format
+            'confirmation_code' => 'nullable',
         ]);
 
         // Check if validation fails
@@ -49,34 +51,47 @@ class DeliveryController extends Controller
             'company_name' => $request->company_name,
             'shipper_id' => $request->shipper_id,
             'status' => $request->status,
-            'delivery_date' => $request->delivery_date,
-            'receive_date' => $request->receive_date,
-            'confirmation_code' => $request->confirmation_code,
+            'delivery_date' => \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->delivery_date)->format('Y-m-d'), // Convert to yyyy-MM-dd
+            'receive_date' => $request->receive_date 
+                ? \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->receive_date)->format('Y-m-d') 
+                : null, // Convert to yyyy-MM-dd if not null // Parsing if not null
+            'confirmation_code' => $request->confirmation_code == null ? "code1234" : $request->confirmation_code,
             'created_by' => 'admin', // Assuming user is authenticated
             'updated_by' => 'admin',
         ]);
 
+        // Create recipient address
+        $address = Address::create([
+            'street' => $request->recipient['street'],
+            'sub_district' => $request->recipient['sub_district'],
+            'district' => $request->recipient['district'],
+            'city' => $request->recipient['city'],
+            'province' => $request->recipient['province'],
+            'postal_code' => $request->recipient['postal_code'],
+        ]);
+
         // Create delivery recipient
-        foreach ($request->recipient as $detail) {
-            DeliveryRecipient::create([
-                'delivery_number' => $delivery->delivery_number,
-                'name' => $detail['name'], // Assuming detail has 'name' field
-                'address_id' => $detail['address_id'], // Assuming detail has 'address_id' field
-            ]);
-        }
+        DeliveryRecipient::create([
+            'delivery_number' => $delivery->delivery_number,
+            'name' => $request->recipient['name'], // Assuming detail has 'name' field
+            'address_id' => $address->id, // Assuming detail has 'address_id' field
+        ]);
 
         // Create delivery history locations
-        foreach ($request->history as $location) {
-            DeliveryHistoryLocation::create([
-                'delivery_number' => $delivery->delivery_number,
-                'latitude' => $location['latitude'],
-                'longitude' => $location['longitude'],
-            ]);
+        if ($request->history != null) {
+            foreach ($request->history as $location) {
+                DeliveryHistoryLocation::create([
+                    'delivery_number' => $delivery->delivery_number,
+                    'latitude' => $location['latitude'],
+                    'longitude' => $location['longitude'],
+                ]);
+            }
         }
 
         // Return response
         return new DeliveryResource(true, 'Data Delivery Berhasil Ditambahkan!', $delivery);
     }
+
 
     /**
      * Display the specified resource.
@@ -98,7 +113,7 @@ class DeliveryController extends Controller
             'delivery_number' => 'required|string',
             'company_name' => 'required|string',
             'shipper_id' => 'required|integer',
-            'status' => 'required|integer',
+            'status' => 'required|string',
             'delivery_date' => 'required|date',
             'receive_date' => 'nullable|date',
             'confirmation_code' => 'required|string',
@@ -120,8 +135,8 @@ class DeliveryController extends Controller
             'delivery_date' => $request->delivery_date,
             'receive_date' => $request->receive_date,
             'confirmation_code' => $request->confirmation_code,
-            'created_by' => $request->created_by, // Assuming user is authenticated
-            'updated_by' => $request->updated_by,
+            'created_by' => 'admin', // Assuming user is authenticated
+            'updated_by' => 'admin',
         ]);
 
         // Create delivery recipient

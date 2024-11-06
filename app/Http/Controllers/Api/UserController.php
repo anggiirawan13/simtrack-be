@@ -8,20 +8,45 @@ use App\Models\Address;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('address')->get();
+        $q = $request->query('q');
+        $paginate = $request->query('paginate', true);
+        $page = $request->query('page', 1);  // Default to page 1
+        $limit = $request->query('limit', 10); // Default to 10 items per page
 
+        // Start a query builder for users with address relationship
+        $query = User::with('address');
+
+        // Apply search filter if 'q' parameter is provided
+        if ($q) {
+            $query->where(function($subQuery) use ($q) {
+                $subQuery->where('username', 'like', '%' . $q . '%')
+                        ->orWhere('fullname', 'like', '%' . $q . '%')
+                        ->orWhere('role', 'like', '%' . $q . '%');
+            });
+        }
+
+        if ($paginate === 'false' || $paginate == 0) {
+            // No pagination, get all results
+            $users = $query->get();
+        } else {
+            // Paginate the results
+            $users = $query->paginate($limit, ['*'], 'page', $page);
+        }
+
+        // Return paginated response as a resource
         return new UserResource(true, 'List Data User', $users);
     }
+
 
     /**
      * Store a newly created resource in storage.

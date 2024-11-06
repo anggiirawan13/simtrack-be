@@ -13,12 +13,32 @@ class ShipperController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $shippers = Shipper::with('user')->get();
+        $q = $request->query('q');             // Search query parameter
+        $page = $request->query('page', 1);    // Page number, default to 1
+        $limit = $request->query('limit', 10); // Items per page, default to 10
 
+        // Start a query builder for Shippers with 'user' relationship
+        $query = Shipper::with('user');
+
+        // Apply search filter if 'q' parameter is provided
+        if ($q) {
+            $query->whereHas('user', function($subQuery) use ($q) {
+                $subQuery->where('fullname', 'like', '%' . $q . '%')
+                        ->orWhere('role', 'like', '%' . $q . '%')
+                        ->orWhere('username', 'like', '%' . $q . '%');
+            })
+            ->orWhere('device_mapping', 'like', '%' . $q . '%');
+        }
+
+        // Paginate the results based on 'page' and 'limit' parameters
+        $shippers = $query->paginate($limit, ['*'], 'page', $page);
+
+        // Return paginated response as a resource
         return new ShipperResource(true, 'List Data Shippers', $shippers);
     }
+
 
     /**
      * Store a newly created resource in storage.

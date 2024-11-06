@@ -17,12 +17,36 @@ class DeliveryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $deliveries = Delivery::all();
+        $q = $request->query('q');             // Search query parameter
+        $paginate = $request->query('paginate');
+        $page = $request->query('page', 1);    // Page number, default to 1
+        $limit = $request->query('limit', 10); // Items per page, default to 10
 
+        // Start a query builder for Delivery with 'shipper' and 'user' relationships
+        $query = Delivery::with(['shipper.user']);
+
+        // Apply search filter if 'q' parameter is provided
+        if ($q) {
+            $query->where('delivery_number', 'like', '%' . $q . '%')
+                ->orWhere('company_name', 'like', '%' . $q . '%')
+                ->orWhereHas('shipper.user', function($subQuery) use ($q) {
+                    $subQuery->where('fullname', 'like', '%' . $q . '%');
+                });
+        }
+
+        if ($paginate == 'false' || $paginate == 0) {
+            $deiveries = $query->get();
+        } else {
+            // Paginate the results based on 'page' and 'limit' parameters
+            $deliveries = $query->paginate($limit, ['*'], 'page', $page);
+        }
+
+        // Return paginated response as a resource
         return new DeliveryResource(true, 'List Data Deliveries', $deliveries);
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -174,4 +198,26 @@ class DeliveryController extends Controller
         // Return response
         return new DeliveryResource(true, 'Data Delivery Berhasil Dihapus!', null);
     }
+
+    public function filterByStatus(Request $request)
+    {
+        $q = $request->query('q');  // Get 'status' query parameter
+        $page = $request->query('page', 1);   // Page number, default to 1
+        $limit = $request->query('limit', 10); // Items per page, default to 10
+
+        // Start a query builder for Delivery with 'shipper' and 'user' relationships
+        $query = Delivery::with(['shipper.user']);
+
+        // Apply status filter if 'status' parameter is provided
+        if ($q) {
+            $query->where('status', $q);
+        }
+
+        // Paginate the results
+        $deliveries = $query->paginate($limit, ['*'], 'page', $page);
+
+        // Return paginated response as a resource
+        return new DeliveryResource(true, 'Filtered Deliveries by Status', $deliveries);
+    }
+
 }

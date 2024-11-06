@@ -12,6 +12,10 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::apiResource('/users', UserController::class);
+
 Route::apiResource('/shippers', ShipperController::class);
+
 Route::apiResource('/deliveries', DeliveryController::class);
+Route::get('/deliveries/filter/status', [DeliveryController::class, 'filterByStatus']);
+
 Route::post('/auth/login', [AuthController::class, 'login']);

@@ -21,6 +21,11 @@ class Delivery extends Model
         'updated_by'
     ];
 
+    public function shipper()
+    {
+        return $this->belongsTo(Shipper::class, 'shipper_id');
+    }
+
     public function address()
     {
         return $this->belongsTo(Address::class, 'delivery_number');

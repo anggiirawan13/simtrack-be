@@ -7,6 +7,7 @@ use App\Http\Resources\ApiResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller {
     public function login(Request $request) 
@@ -20,7 +21,7 @@ class AuthController extends Controller {
             return new ApiResource([
                 'status' => false,
                 'message' => 'Username does not exist.',
-                'data' => null,
+                'resource' => null,
             ], 404);
         }
 
@@ -29,22 +30,23 @@ class AuthController extends Controller {
                 return new ApiResource([
                     'status' => false,
                     'message' => 'Invalid password.',
-                    'data' => null,
+                    'resource' => null,
                 ], 401);
             }
         } catch (\Exception $e) {
             return new ApiResource([
                 'status' => false,
                 'message' => 'An error occurred while decrypting the password.',
-                'data' => null,
+                'resource' => null,
             ], 500);
         }
 
+        Log::info($user);
         // Login berhasil
         return new ApiResource([
             'status' => true,
             'message' => 'Login successful!',
-            'data' => $user,
+            'resource' => $user,
         ]);
     }
 }

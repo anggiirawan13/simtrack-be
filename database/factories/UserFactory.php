@@ -3,8 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -24,7 +23,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Crypt::encrypt('password'),
         ];
     }
 

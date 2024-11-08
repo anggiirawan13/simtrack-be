@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Address;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -132,14 +133,10 @@ class UserController extends Controller
             'id' => $id,
             'fullname' => $request->fullname,
             'username' => $request->username,
+            'password' => Crypt::encrypt($request->password),
             'role' => $request->role,
             'address_id' => $address->id,
         ];
-
-        // Update password only if provided
-        if ($request->filled('password') && !Hash::check($request->password, $user->password)) {
-            $userData['password'] = Hash::make($request->password); // Hash password before saving
-        }
 
         // Update user
         $user->update($userData);

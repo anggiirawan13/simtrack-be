@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Crypt;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -35,16 +36,15 @@ class User extends Authenticatable
         'updated_at'
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function setPasswordAttribute($value)
     {
-        return [
-            'password' => 'hashed',
-        ];
+        $this->attributes['password'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi secret_data saat diambil
+    public function getPasswordAttribute($value)
+    {
+        return Crypt::decrypt($value);
     }
 
     public function address()

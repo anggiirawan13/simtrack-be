@@ -18,7 +18,7 @@ class ShipperSeeder extends Seeder
         $faker = Faker::create();
 
         // Generate 30 fake users
-        foreach (range(5, 37) as $index) {
+        foreach (range(74, 106) as $index) {
             DB::table('shippers')->insert([
                 'user_id' => $index,  // Ganti dengan password yang diinginkan
                 'device_mapping' => $faker->uuid(),

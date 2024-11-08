@@ -9,7 +9,6 @@ use App\Models\Delivery;
 use App\Models\DeliveryRecipient;
 use App\Models\DeliveryHistoryLocation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller

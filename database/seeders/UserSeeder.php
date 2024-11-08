@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
             'fullname' => 'Administrator One',
             'username' => 'administrator1',
             'password' => Crypt::encrypt('admin1@1234'),
+            'device_mapping' => '1',
             'role' => 'Admin', // you can specify any role here
             'address_id' => 1, // sample address_id, adjust as necessary
             'created_at' => now(),
@@ -28,6 +29,7 @@ class UserSeeder extends Seeder
             'fullname' => 'Director One',
             'username' => 'director1',
             'password' => Crypt::encrypt('director1@1234'),
+            'device_mapping' => '1',
             'role' => 'Director', // you can specify any role here
             'address_id' => 1, // sample address_id, adjust as necessary
             'created_at' => now(),
@@ -38,6 +40,7 @@ class UserSeeder extends Seeder
             'fullname' => 'Shipper One',
             'username' => 'shipper1',
             'password' => Crypt::encrypt('shipper1@1234'),
+            'device_mapping' => '1',
             'role' => 'Shipper', // you can specify any role here
             'address_id' => 1, // sample address_id, adjust as necessary
             'created_at' => now(),
@@ -52,6 +55,7 @@ class UserSeeder extends Seeder
                 'password' => Crypt::encrypt('password'),  // Ganti dengan password yang diinginkan
                 'fullname' => $faker->name,
                 'username' => $faker->unique()->userName,
+                'device_mapping' => '1',
                 'role' => 'Shipper',  // Ganti dengan role yang ada
                 'address_id' => 1,  // Sesuaikan jika ada relasi dengan tabel addresses
                 'created_at' => now(),

@@ -21,18 +21,19 @@ class Delivery extends Model
         'updated_by'
     ];
 
-    public function shipper()
+    public function recipient()
     {
-        return $this->belongsTo(Shipper::class, 'shipper_id');
+        return $this->hasOne(DeliveryRecipient::class, 'delivery_number', 'delivery_number');
     }
 
-    public function address()
+    public function shipper()
     {
-        return $this->belongsTo(Address::class, 'delivery_number');
+        return $this->hasOne(Shipper::class, 'id', 'shipper_id');
     }
+
 
     public function history()
     {
-        return $this->hasMany(DeliveryHistoryLocation::class, 'delivery_number');
+        return $this->hasMany(DeliveryHistoryLocation::class, 'delivery_number', 'delivery_number');
     }
 }

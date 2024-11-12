@@ -9,6 +9,7 @@ use App\Models\Delivery;
 use App\Models\DeliveryRecipient;
 use App\Models\DeliveryHistoryLocation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
@@ -36,7 +37,7 @@ class DeliveryController extends Controller
         }
 
         if ($paginate == 'false' || $paginate == 0) {
-            $deiveries = $query->get();
+            $deliveries = $query->get();
         } else {
             // Paginate the results based on 'page' and 'limit' parameters
             $deliveries = $query->paginate($limit, ['*'], 'page', $page);
@@ -121,7 +122,7 @@ class DeliveryController extends Controller
      */
     public function show($id)
     {
-        $delivery = Delivery::find($id);
+        $delivery = Delivery::with('recipient')->find($id);
 
         return new DeliveryResource(true, 'Detail Data Delivery!', $delivery);
     }
@@ -219,4 +220,35 @@ class DeliveryController extends Controller
         return new DeliveryResource(true, 'Filtered Deliveries by Status', $deliveries);
     }
 
+    public function generateDeliveryNumber() {
+        // Mendapatkan tanggal hari ini dalam format 'yymmdd'
+        $date = date('ymd');
+        
+        // Format awal untuk nomor pengiriman
+        $prefix = 'AHE' . $date;
+        
+        // Mendapatkan nomor urut terakhir dari database
+        // Misalnya, cek nomor terakhir yang ada di kolom 'delivery_number' dalam tabel 'deliveries'
+        $lastDelivery = Delivery::where('delivery_number', 'like', $prefix . '%')
+                                ->orderBy('delivery_number', 'desc')
+                                ->first();
+        
+        // Jika ada nomor pengiriman sebelumnya, ambil running number terakhir dan tambah 1
+        if ($lastDelivery) {
+            $lastNumber = (int)substr($lastDelivery->delivery_number, -5); // Mengambil 5 digit terakhir
+            $newNumber = $lastNumber + 1;
+        } else {
+            // Jika belum ada nomor pengiriman hari ini, mulai dari 1
+            $newNumber = 1;
+        }
+        
+        // Mengubah nomor urut menjadi 5 digit dengan leading zero (misalnya: 00001, 00002, dst)
+        $runningNumber = str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+        
+        // Menggabungkan prefix dengan nomor urut untuk mendapatkan nomor pengiriman final
+        $deliveryNumber = $prefix . $runningNumber;
+        
+        return new DeliveryResource(true, 'Generate Delivery Number Success', $deliveryNumber);
+    }
+    
 }

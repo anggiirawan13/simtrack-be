@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ShipperResource;
+use App\Models\Delivery;
 use App\Models\Shipper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -109,9 +110,16 @@ class ShipperController extends Controller
      */
     public function destroy($id)
     {
-        $shipper = Shipper::find($id);
+        $delivery = Delivery::where('shipper_id', $id)->first();
+        if ($delivery) {
+            return new ShipperResource(false, 'Shipper sudah pernah ditugaskan untuk pengiriman.', null);
+        }
 
-        //delete shipper
+        $shipper = Shipper::find($id);
+        if (!$shipper) {
+            return new ShipperResource(false, 'Data shipper tidak ditemukan!', null);
+        }
+
         $shipper->delete();
 
         //return response

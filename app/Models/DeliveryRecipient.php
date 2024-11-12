@@ -17,6 +17,6 @@ class DeliveryRecipient extends Model
 
     public function address()
     {
-        return $this->belongsTo(Address::class, 'address_id');
+        return $this->hasOne(Address::class, 'id', 'address_id');
     }
 }

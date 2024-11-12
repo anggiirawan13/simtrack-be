@@ -16,7 +16,6 @@ return new class extends Migration
             $table->text('password');
             $table->string('fullname');
             $table->string('username')->unique();
-            $table->string('device_mapping');
             $table->string('role');
             $table->integer('address_id');
             $table->timestamps();

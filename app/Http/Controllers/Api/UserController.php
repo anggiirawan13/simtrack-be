@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\Address;
+use App\Models\Shipper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -49,9 +50,6 @@ class UserController extends Controller
     }
 
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -60,9 +58,13 @@ class UserController extends Controller
             'username' => 'required',
         ]);
 
-        //check if validation fails
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return new UserResource(false, 'Ada kolom yang wajid diisi.', $validator->errors());
+        }
+
+        $user = User::where('username', $request->username)->first();
+        if ($user) {
+            return new UserResource(false, 'Username sudah ada.', null);
         }
 
         $address = Address::create([
@@ -74,7 +76,6 @@ class UserController extends Controller
             'postal_code' => $request->address['postal_code'],
         ]);
 
-        //create user
         $user = User::create([
             'password' => $request->password,
             'fullname' => $request->fullname,
@@ -83,7 +84,6 @@ class UserController extends Controller
             'address_id' => $address->id,
         ]);
 
-        //return response
         return new UserResource(true, 'Data User Berhasil Ditambahkan!', null);
     }
 
@@ -111,7 +111,12 @@ class UserController extends Controller
 
         // Check if validation fails
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return new UserResource(false, 'Ada kolom yang wajid diisi.', $validator->errors());
+        }
+
+        $user = User::where('username', $request->username)->first();
+        if ($user) {
+            return new UserResource(false, 'Username sudah ada.', null);
         }
 
         // Find user by ID
@@ -133,7 +138,7 @@ class UserController extends Controller
             'id' => $id,
             'fullname' => $request->fullname,
             'username' => $request->username,
-            'password' => Crypt::encrypt($request->password),
+            'password' => $request->password,
             'role' => $request->role,
             'address_id' => $address->id,
         ];
@@ -151,7 +156,15 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        $shipper = Shipper::where('user_id', $id)->first();
+        if ($shipper) {
+            return new UserResource(false, 'User sudah dimapping dengan shipper.', null);
+        }
+
         $user = User::find($id);
+        if (!$user) {
+            return new UserResource(false, 'User tidak ditemukan.', null);
+        }
 
         //delete user
         $user->delete();

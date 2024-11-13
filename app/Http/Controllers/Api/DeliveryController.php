@@ -122,7 +122,7 @@ class DeliveryController extends Controller
      */
     public function show($id)
     {
-        $delivery = Delivery::with('recipient')->find($id);
+        $delivery = Delivery::with('recipient')->with('recipient.address')->find($id);
 
         return new DeliveryResource(true, 'Detail Data Delivery!', $delivery);
     }

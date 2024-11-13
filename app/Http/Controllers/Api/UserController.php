@@ -158,7 +158,7 @@ class UserController extends Controller
     {
         $shipper = Shipper::where('user_id', $id)->first();
         if ($shipper) {
-            return new UserResource(false, 'User sudah dimapping dengan shipper.', null);
+            return new UserResource(false, 'User tidak bisa dihapus, karena sudah dimapping dengan shipper.', null);
         }
 
         $user = User::find($id);

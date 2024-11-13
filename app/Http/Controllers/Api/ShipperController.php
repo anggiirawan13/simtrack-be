@@ -112,7 +112,7 @@ class ShipperController extends Controller
     {
         $delivery = Delivery::where('shipper_id', $id)->first();
         if ($delivery) {
-            return new ShipperResource(false, 'Shipper sudah pernah ditugaskan untuk pengiriman.', null);
+            return new ShipperResource(false, 'Shipper tidak bisa dihapus, karena sudah pernah ditugaskan untuk pengiriman.', null);
         }
 
         $shipper = Shipper::find($id);

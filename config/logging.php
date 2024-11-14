@@ -62,7 +62,7 @@ return [
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
-            'level' => 'debug', // Ubah level sesuai kebutuhan
+            'level' => 'debug',
         ],
 
         'daily' => [

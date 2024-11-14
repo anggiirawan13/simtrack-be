@@ -19,8 +19,8 @@ class UserSeeder extends Seeder
             'username' => 'administrator1',
             'password' => Crypt::encrypt('admin1@1234'),
             'device_mapping' => '1',
-            'role' => 'Admin', // you can specify any role here
-            'address_id' => 1, // sample address_id, adjust as necessary
+            'role' => 'Admin',
+            'address_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -30,8 +30,8 @@ class UserSeeder extends Seeder
             'username' => 'director1',
             'password' => Crypt::encrypt('director1@1234'),
             'device_mapping' => '1',
-            'role' => 'Director', // you can specify any role here
-            'address_id' => 1, // sample address_id, adjust as necessary
+            'role' => 'Director',
+            'address_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -41,23 +41,23 @@ class UserSeeder extends Seeder
             'username' => 'shipper1',
             'password' => Crypt::encrypt('shipper1@1234'),
             'device_mapping' => '1',
-            'role' => 'Shipper', // you can specify any role here
-            'address_id' => 1, // sample address_id, adjust as necessary
+            'role' => 'Shipper',
+            'address_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         $faker = Faker::create();
 
-        // Generate 30 fake users
+       
         foreach (range(1, 30) as $index) {
             DB::table('users')->insert([
-                'password' => Crypt::encrypt('password'),  // Ganti dengan password yang diinginkan
+                'password' => Crypt::encrypt('password'), 
                 'fullname' => $faker->name,
                 'username' => $faker->unique()->userName,
                 'device_mapping' => '1',
-                'role' => 'Shipper',  // Ganti dengan role yang ada
-                'address_id' => 1,  // Sesuaikan jika ada relasi dengan tabel addresses
+                'role' => 'Shipper', 
+                'address_id' => 1, 
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

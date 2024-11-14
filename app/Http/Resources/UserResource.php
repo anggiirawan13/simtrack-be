@@ -8,7 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserResource extends JsonResource
 {
-    //define properti
+   
     public $status;
     public $message;
     public $resource;

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
+            $table->string('whatsapp');
             $table->string('street');
             $table->string('sub_district');
             $table->string('district');

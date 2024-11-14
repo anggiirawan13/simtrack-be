@@ -13,8 +13,8 @@ class ShipperFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => 1, // Mengasumsikan ada factory untuk User, agar Shipper terhubung ke User
-            'device_mapping' => $this->faker->uuid(), // Menghasilkan UUID acak untuk device_mapping
+            'user_id' => 1,
+            'device_mapping' => $this->faker->uuid(),
         ];
     }
 }

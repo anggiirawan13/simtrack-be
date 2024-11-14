@@ -8,9 +8,6 @@ use App\Models\Address;
 use App\Models\Shipper;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -22,13 +19,13 @@ class UserController extends Controller
     {
         $q = $request->query('q');
         $paginate = $request->query('paginate', true);
-        $page = $request->query('page', 1);  // Default to page 1
-        $limit = $request->query('limit', 10); // Default to 10 items per page
+        $page = $request->query('page', 1); 
+        $limit = $request->query('limit', 10);
 
-        // Start a query builder for users with address relationship
+       
         $query = User::with('address');
 
-        // Apply search filter if 'q' parameter is provided
+       
         if ($q) {
             $query->where(function($subQuery) use ($q) {
                 $subQuery->where('username', 'like', '%' . $q . '%')
@@ -38,14 +35,14 @@ class UserController extends Controller
         }
 
         if ($paginate === 'false' || $paginate == 0) {
-            // No pagination, get all results
+           
             $users = $query->get();
         } else {
-            // Paginate the results
+           
             $users = $query->paginate($limit, ['*'], 'page', $page);
         }
 
-        // Return paginated response as a resource
+       
         return new UserResource(true, 'List Data User', $users);
     }
 
@@ -68,6 +65,7 @@ class UserController extends Controller
         }
 
         $address = Address::create([
+            'whatsapp' => $request->address['whatsapp'],
             'street' => $request->address['street'],
             'sub_district' => $request->address['sub_district'],
             'district' => $request->address['district'],
@@ -102,14 +100,14 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Define validation rules
+       
         $validator = Validator::make($request->all(), [
-            'password' => 'nullable', // Allow password to be null
+            'password' => 'nullable',
             'fullname' => 'required',
             'username' => 'required',
         ]);
 
-        // Check if validation fails
+       
         if ($validator->fails()) {
             return new UserResource(false, 'Ada kolom yang wajid diisi.', $validator->errors());
         }
@@ -119,12 +117,13 @@ class UserController extends Controller
             return new UserResource(false, 'Username sudah ada.', null);
         }
 
-        // Find user by ID
+       
         $user = User::find($id);
         $address = Address::find($user->address_id);
 
-        // Update address fields
+       
         $address->update([
+            'whatsapp' => $request->address['whatsapp'],
             'street' => $request->address['street'],
             'sub_district' => $request->address['sub_district'],
             'district' => $request->address['district'],
@@ -133,7 +132,7 @@ class UserController extends Controller
             'postal_code' => $request->address['postal_code'],
         ]);
 
-        // Prepare data for user update
+       
         $userData = [
             'id' => $id,
             'fullname' => $request->fullname,
@@ -143,10 +142,10 @@ class UserController extends Controller
             'address_id' => $address->id,
         ];
 
-        // Update user
+       
         $user->update($userData);
 
-        // Return response
+       
         return new UserResource(true, 'Data User Berhasil Diubah!', $user);
     }
 
@@ -166,10 +165,10 @@ class UserController extends Controller
             return new UserResource(false, 'User tidak ditemukan.', null);
         }
 
-        //delete user
+       
         $user->delete();
 
-        //return response
+       
         return new UserResource(true, 'Data User Berhasil Dihapus!', null);
     }
 }

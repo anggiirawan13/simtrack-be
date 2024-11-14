@@ -16,14 +16,14 @@ class ShipperController extends Controller
      */
     public function index(Request $request)
     {
-        $q = $request->query('q');             // Search query parameter
-        $page = $request->query('page', 1);    // Page number, default to 1
-        $limit = $request->query('limit', 10); // Items per page, default to 10
+        $q = $request->query('q');            
+        $page = $request->query('page', 1);   
+        $limit = $request->query('limit', 10);
 
-        // Start a query builder for Shippers with 'user' relationship
+       
         $query = Shipper::with('user');
 
-        // Apply search filter if 'q' parameter is provided
+       
         if ($q) {
             $query->whereHas('user', function($subQuery) use ($q) {
                 $subQuery->where('fullname', 'like', '%' . $q . '%')
@@ -33,10 +33,10 @@ class ShipperController extends Controller
             ->orWhere('device_mapping', 'like', '%' . $q . '%');
         }
 
-        // Paginate the results based on 'page' and 'limit' parameters
+       
         $shippers = $query->paginate($limit, ['*'], 'page', $page);
 
-        // Return paginated response as a resource
+       
         return new ShipperResource(true, 'List Data Shippers', $shippers);
     }
 
@@ -51,18 +51,18 @@ class ShipperController extends Controller
             'device_mapping'   => 'required',
         ]);
 
-        //check if validation fails
+       
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        //create shipper
+       
         $shipper = Shipper::create([
             'user_id'     => $request->user_id,
             'device_mapping'   => $request->device_mapping,
         ]);
 
-        //return response
+       
         return new ShipperResource(true, 'Data Shipper Berhasil Ditambahkan!', $shipper);
     }
 
@@ -81,27 +81,27 @@ class ShipperController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //define validation rules
+       
         $validator = Validator::make($request->all(), [
             'user_id'     => 'required',
             'device_mapping'   => 'required',
         ]);
 
-        //check if validation fails
+       
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        //find shipper by ID
+       
         $shipper = Shipper::find($id);
 
-        //update shipper without image
+       
         $shipper->update([
             'user_id'     => $request->user_id,
             'device_mapping'   => $request->device_mapping,
         ]);
 
-        //return response
+       
         return new ShipperResource(true, 'Data Shipper Berhasil Diubah!', $shipper);
     }
 
@@ -122,7 +122,7 @@ class ShipperController extends Controller
 
         $shipper->delete();
 
-        //return response
+       
         return new ShipperResource(true, 'Data Shipper Berhasil Dihapus!', null);
     }
 }

@@ -41,7 +41,7 @@ class User extends Authenticatable
         $this->attributes['password'] = Crypt::encrypt($value);
     }
 
-    // Accessor untuk mendekripsi secret_data saat diambil
+   
     public function getPasswordAttribute($value)
     {
         return Crypt::decrypt($value);

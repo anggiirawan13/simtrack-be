@@ -14,20 +14,15 @@ use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        $q = $request->query('q');             // Search query parameter
+        $q = $request->query('q');            
         $paginate = $request->query('paginate');
-        $page = $request->query('page', 1);    // Page number, default to 1
-        $limit = $request->query('limit', 10); // Items per page, default to 10
-
-        // Start a query builder for Delivery with 'shipper' and 'user' relationships
-        $query = Delivery::with(['shipper.user']);
-
-        // Apply search filter if 'q' parameter is provided
+        $page = $request->query('page', 1);   
+        $limit = $request->query('limit', 10);
+       
+        $query = new Delivery();
+       
         if ($q) {
             $query->where('delivery_number', 'like', '%' . $q . '%')
                 ->orWhere('company_name', 'like', '%' . $q . '%')
@@ -39,69 +34,66 @@ class DeliveryController extends Controller
         if ($paginate == 'false' || $paginate == 0) {
             $deliveries = $query->get();
         } else {
-            // Paginate the results based on 'page' and 'limit' parameters
+           
             $deliveries = $query->paginate($limit, ['*'], 'page', $page);
         }
 
-        // Return paginated response as a resource
         return new DeliveryResource(true, 'List Data Deliveries', $deliveries);
     }
 
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // Validate input
+       
         $validator = Validator::make($request->all(), [
             'delivery_number' => 'required|string',
             'company_name' => 'required|string',
             'shipper_id' => 'required|integer',
             'status' => 'required|string',
-            'delivery_date' => 'required', // Adjusting to match yyyy-MM-dd format
-            'receive_date' => 'nullable', // Adjusting to match yyyy-MM-dd format
+            'delivery_date' => 'required',
+            'receive_date' => 'nullable',
             'confirmation_code' => 'nullable',
         ]);
 
-        // Check if validation fails
+       
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        // Create delivery
+       
         $delivery = Delivery::create([
             'delivery_number' => $request->delivery_number,
             'company_name' => $request->company_name,
             'shipper_id' => $request->shipper_id,
             'status' => $request->status,
-            'delivery_date' => \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->delivery_date)->format('Y-m-d'), // Convert to yyyy-MM-dd
+            'delivery_date' => \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->delivery_date)->format('Y-m-d'),
             'receive_date' => $request->receive_date 
                 ? \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->receive_date)->format('Y-m-d') 
-                : null, // Convert to yyyy-MM-dd if not null // Parsing if not null
+                : null,
             'confirmation_code' => $request->confirmation_code == null ? "code1234" : $request->confirmation_code,
-            'created_by' => 'admin', // Assuming user is authenticated
+            'created_by' => 'admin',
             'updated_by' => 'admin',
         ]);
 
-        // Create recipient address
+       
         $address = Address::create([
-            'street' => $request->recipient['street'],
-            'sub_district' => $request->recipient['sub_district'],
-            'district' => $request->recipient['district'],
-            'city' => $request->recipient['city'],
-            'province' => $request->recipient['province'],
-            'postal_code' => $request->recipient['postal_code'],
+            'whatsapp' => $request->recipient['address']['whatsapp'],
+            'street' => $request->recipient['address']['street'],
+            'sub_district' => $request->recipient['address']['sub_district'],
+            'district' => $request->recipient['address']['district'],
+            'city' => $request->recipient['address']['city'],
+            'province' => $request->recipient['address']['province'],
+            'postal_code' => $request->recipient['address']['postal_code'],
         ]);
 
-        // Create delivery recipient
+       
         DeliveryRecipient::create([
             'delivery_number' => $delivery->delivery_number,
-            'name' => $request->recipient['name'], // Assuming detail has 'name' field
-            'address_id' => $address->id, // Assuming detail has 'address_id' field
+            'name' => $request->recipient['name'],
+            'address_id' => $address->id,
         ]);
 
-        // Create delivery history locations
+       
         if ($request->history != null) {
             foreach ($request->history as $location) {
                 DeliveryHistoryLocation::create([
@@ -112,14 +104,11 @@ class DeliveryController extends Controller
             }
         }
 
-        // Return response
+       
         return new DeliveryResource(true, 'Data Delivery Berhasil Ditambahkan!', $delivery);
     }
 
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $delivery = Delivery::with('recipient')->with('recipient.address')->find($id);
@@ -127,125 +116,121 @@ class DeliveryController extends Controller
         return new DeliveryResource(true, 'Detail Data Delivery!', $delivery);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
-    {
-        // Validate input
-        $validator = Validator::make($request->all(), [
-            'delivery_number' => 'required|string',
-            'company_name' => 'required|string',
-            'shipper_id' => 'required|integer',
-            'status' => 'required|string',
-            'delivery_date' => 'required|date',
-            'receive_date' => 'nullable|date',
-            'confirmation_code' => 'required|string',
-            'recipient' => 'required|array', // array of delivery recipient
-            'history' => 'required|array', // array of history locations
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'id' => 'required|integer',
+        'delivery_number' => 'required|string',
+        'company_name' => 'required|string',
+        'shipper_id' => 'required|integer',
+        'status' => 'required|string',
+        'delivery_date' => 'required|date',
+        'receive_date' => 'nullable|date',
+        'confirmation_code' => 'required|string',
+    ]);
 
-        // Check if validation fails
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        // Create delivery
-        $delivery = Delivery::create([
-            'delivery_number' => $request->delivery_number,
-            'company_name' => $request->company_name,
-            'shipper_id' => $request->shipper_id,
-            'status' => $request->status,
-            'delivery_date' => $request->delivery_date,
-            'receive_date' => $request->receive_date,
-            'confirmation_code' => $request->confirmation_code,
-            'created_by' => 'admin', // Assuming user is authenticated
-            'updated_by' => 'admin',
-        ]);
-
-        // Create delivery recipient
-        foreach ($request->recipient as $detail) {
-            DeliveryRecipient::create([
-                'delivery_number' => $delivery->delivery_number,
-                'name' => $detail['name'], // Assuming detail has 'name' field
-                'address_id' => $detail['address_id'], // Assuming detail has 'address_id' field
-            ]);
-        }
-
-        // Create delivery history locations
-        foreach ($request->history as $location) {
-            DeliveryHistoryLocation::create([
-                'delivery_number' => $delivery->delivery_number,
-                'latitude' => $location['latitude'],
-                'longitude' => $location['longitude'],
-            ]);
-        }
-
-        // Return response
-        return new DeliveryResource(true, 'Data Delivery Berhasil Ditambahkan!', $delivery);
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    $delivery = Delivery::findOrFail($id);
+
+    $delivery->update([
+        'delivery_number' => $request->delivery_number,
+        'company_name' => $request->company_name,
+        'shipper_id' => $request->shipper_id,
+        'status' => $request->status,
+        'delivery_date' => \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->delivery_date)->format('Y-m-d'),
+            'receive_date' => $request->receive_date 
+                ? \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->receive_date)->format('Y-m-d') 
+                : null,
+        'confirmation_code' => $request->confirmation_code,
+        'created_by' => 'admin',
+        'updated_by' => 'admin',
+    ]);
+
+    // Pastikan address_id dan recipient_id ditambahkan dalam request atau sesuaikan pengambilan id-nya
+    $address = Address::findOrFail($request->recipient['address']['id']);
+
+    $address->update([
+        'whatsapp' => $request->recipient['address']['whatsapp'],
+        'street' => $request->recipient['address']['street'],
+        'sub_district' => $request->recipient['address']['sub_district'],
+        'district' => $request->recipient['address']['district'],
+        'city' => $request->recipient['address']['city'],
+        'province' => $request->recipient['address']['province'],
+        'postal_code' => $request->recipient['address']['postal_code'],
+    ]);
+
+    $recipient = DeliveryRecipient::findOrFail($request->recipient['id']);
+    $recipient->update([
+        'delivery_number' => $delivery->delivery_number,
+        'name' => $request->recipient['name'],
+        'address_id' => $address->id,
+    ]);
+
+    return new DeliveryResource(true, 'Data Delivery Berhasil Ditambahkan!', $delivery);
+}
+
+
     public function destroy($id)
     {
         $delivery = Delivery::find($id);
 
-        // Delete delivery
+       
         $delivery->delete();
 
-        // Return response
+       
         return new DeliveryResource(true, 'Data Delivery Berhasil Dihapus!', null);
     }
 
     public function filterByStatus(Request $request)
     {
-        $q = $request->query('q');  // Get 'status' query parameter
-        $page = $request->query('page', 1);   // Page number, default to 1
-        $limit = $request->query('limit', 10); // Items per page, default to 10
+        $q = $request->query('q'); 
+        $page = $request->query('page', 1);  
+        $limit = $request->query('limit', 10);
 
-        // Start a query builder for Delivery with 'shipper' and 'user' relationships
+       
         $query = Delivery::with(['shipper.user']);
 
-        // Apply status filter if 'status' parameter is provided
+       
         if ($q) {
             $query->where('status', $q);
         }
 
-        // Paginate the results
+       
         $deliveries = $query->paginate($limit, ['*'], 'page', $page);
 
-        // Return paginated response as a resource
+       
         return new DeliveryResource(true, 'Filtered Deliveries by Status', $deliveries);
     }
 
     public function generateDeliveryNumber() {
-        // Mendapatkan tanggal hari ini dalam format 'yymmdd'
+       
         $date = date('ymd');
         
-        // Format awal untuk nomor pengiriman
+       
         $prefix = 'AHE' . $date;
         
-        // Mendapatkan nomor urut terakhir dari database
-        // Misalnya, cek nomor terakhir yang ada di kolom 'delivery_number' dalam tabel 'deliveries'
+       
+       
         $lastDelivery = Delivery::where('delivery_number', 'like', $prefix . '%')
                                 ->orderBy('delivery_number', 'desc')
                                 ->first();
         
-        // Jika ada nomor pengiriman sebelumnya, ambil running number terakhir dan tambah 1
+       
         if ($lastDelivery) {
-            $lastNumber = (int)substr($lastDelivery->delivery_number, -5); // Mengambil 5 digit terakhir
+            $lastNumber = (int)substr($lastDelivery->delivery_number, -5);
             $newNumber = $lastNumber + 1;
         } else {
-            // Jika belum ada nomor pengiriman hari ini, mulai dari 1
+           
             $newNumber = 1;
         }
         
-        // Mengubah nomor urut menjadi 5 digit dengan leading zero (misalnya: 00001, 00002, dst)
+       
         $runningNumber = str_pad($newNumber, 5, '0', STR_PAD_LEFT);
         
-        // Menggabungkan prefix dengan nomor urut untuk mendapatkan nomor pengiriman final
+       
         $deliveryNumber = $prefix . $runningNumber;
         
         return new DeliveryResource(true, 'Generate Delivery Number Success', $deliveryNumber);

@@ -7,13 +7,11 @@ use App\Http\Resources\ShipperResource;
 use App\Models\Delivery;
 use App\Models\Shipper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class ShipperController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $q = $request->query('q');            
@@ -41,9 +39,6 @@ class ShipperController extends Controller
     }
 
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -66,9 +61,6 @@ class ShipperController extends Controller
         return new ShipperResource(true, 'Data Shipper Berhasil Ditambahkan!', $shipper);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $shipper = Shipper::find($id);
@@ -76,9 +68,6 @@ class ShipperController extends Controller
         return new ShipperResource(true, 'Detail Data Shipper!', $shipper);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
        
@@ -105,9 +94,6 @@ class ShipperController extends Controller
         return new ShipperResource(true, 'Data Shipper Berhasil Diubah!', $shipper);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $delivery = Delivery::where('shipper_id', $id)->first();
@@ -124,5 +110,21 @@ class ShipperController extends Controller
 
        
         return new ShipperResource(true, 'Data Shipper Berhasil Dihapus!', null);
+    }
+
+    public function updateDeviceMapping($id, Request $request)
+    {
+        $shipper = Shipper::find($id);
+
+        Log::info($id);
+        Log::info($request->all());
+
+       
+        $shipper->update([
+            'device_mapping'   => $request->device_mapping,
+        ]);
+
+       
+        return new ShipperResource(true, 'Device mapping berhasi diubah!', $shipper);
     }
 }

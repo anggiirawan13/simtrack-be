@@ -15,14 +15,14 @@ class AuthController extends Controller {
     {
         $credentials = $request->only('username', 'password');
 
-        $user = User::where('username', $credentials['username'])->first();
+        $user = User::with('shipper')->where('username', $credentials['username'])->first();
 
         if (!$user) {
             return new ApiResource([
                 'status' => false,
                 'message' => 'Username atau password salah.',
                 'resource' => null,
-            ], 404);
+            ]);
         }
 
         try {
@@ -31,17 +31,16 @@ class AuthController extends Controller {
                     'status' => false,
                     'message' => 'Username atau password salah.',
                     'resource' => null,
-                ], 401);
+                ]);
             }
         } catch (Exception $e) {
             return new ApiResource([
                 'status' => false,
                 'message' => 'Terjadi kesalahan pada sistem.',
                 'resource' => null,
-            ], 500);
+            ]);
         }
 
-        Log::info($user);
         return new ApiResource([
             'status' => true,
             'message' => 'Login berhasil.',

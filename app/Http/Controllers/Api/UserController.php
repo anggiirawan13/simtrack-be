@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $q = $request->query('q');
@@ -85,9 +82,6 @@ class UserController extends Controller
         return new UserResource(true, 'Data User Berhasil Ditambahkan!', null);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $user = User::with('address')->find($id);
@@ -95,9 +89,6 @@ class UserController extends Controller
         return new UserResource(true, 'Detail Data User!', $user);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
        
@@ -113,7 +104,7 @@ class UserController extends Controller
         }
 
         $user = User::where('username', $request->username)->first();
-        if ($user) {
+        if ($user->id != $id) {
             return new UserResource(false, 'Username sudah ada.', null);
         }
 
@@ -150,9 +141,6 @@ class UserController extends Controller
     }
 
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $shipper = Shipper::where('user_id', $id)->first();

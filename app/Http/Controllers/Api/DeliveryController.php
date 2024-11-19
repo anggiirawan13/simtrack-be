@@ -9,7 +9,6 @@ use App\Models\Delivery;
 use App\Models\DeliveryRecipient;
 use App\Models\DeliveryHistoryLocation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
@@ -17,11 +16,10 @@ class DeliveryController extends Controller
     public function index(Request $request)
     {
         $q = $request->query('q');            
-        $paginate = $request->query('paginate');
         $page = $request->query('page', 1);   
         $limit = $request->query('limit', 10);
        
-        $query = new Delivery();
+        $query = Delivery::query();
        
         if ($q) {
             $query->where('delivery_number', 'like', '%' . $q . '%')
@@ -31,12 +29,7 @@ class DeliveryController extends Controller
                 });
         }
 
-        if ($paginate == 'false' || $paginate == 0) {
-            $deliveries = $query->get();
-        } else {
-           
-            $deliveries = $query->paginate($limit, ['*'], 'page', $page);
-        }
+        $deliveries = $query->paginate($limit, ['*'], 'page', $page);
 
         return new DeliveryResource(true, 'List Data Deliveries', $deliveries);
     }

@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Address::class, 'id', 'address_id');
     }
+
+    public function shipper()
+    {
+        return $this->hasOne(Shipper::class, 'user_id', 'id');
+    }
 }

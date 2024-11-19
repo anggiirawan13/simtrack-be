@@ -17,6 +17,9 @@ Route::apiResource('/dashboard', DashboardController::class);
 Route::apiResource('/users', UserController::class);
 
 Route::apiResource('/shippers', ShipperController::class);
+Route::prefix('/shippers')->group(function () {
+    Route::put('/token/{id}', [ShipperController::class, 'updateDeviceMapping']);
+});
 
 Route::apiResource('/deliveries', DeliveryController::class);
 Route::prefix('/deliveries')->group(function () {

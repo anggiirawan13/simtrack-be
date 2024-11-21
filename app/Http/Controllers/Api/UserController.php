@@ -159,4 +159,11 @@ class UserController extends Controller
        
         return new UserResource(true, 'Data User Berhasil Dihapus!', null);
     }
+
+    public function getUsersShipper()
+    {     
+        $users = User::with('address')->where('role', 'Shipper')->get();
+       
+        return new UserResource(true, 'List Data User', $users);
+    }
 }

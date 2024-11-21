@@ -229,4 +229,25 @@ class DeliveryController extends Controller
         return new DeliveryResource(true, 'Generate Delivery Number Success', $deliveryNumber);
     }
     
+    public function getByShipper(Request $request)
+    {
+        $id = $request->query('id');  
+        $q = $request->query('q');  
+        $page = $request->query('page', 1);   
+        $limit = $request->query('limit', 10);
+       
+        $query = Delivery::where('shipper_id', $id);
+       
+        if ($q) {
+            $query->where('delivery_number', 'like', '%' . $q . '%')
+                ->orWhere('company_name', 'like', '%' . $q . '%')
+                ->orWhereHas('shipper.user', function($subQuery) use ($q) {
+                    $subQuery->where('fullname', 'like', '%' . $q . '%');
+                });
+        }
+
+        $deliveries = $query->paginate($limit, ['*'], 'page', $page);
+
+        return new DeliveryResource(true, 'List Data Deliveries', $deliveries);
+    }
 }

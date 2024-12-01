@@ -9,7 +9,6 @@ use App\Models\Delivery;
 use App\Models\DeliveryRecipient;
 use App\Models\DeliveryHistoryLocation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
@@ -98,7 +97,6 @@ class DeliveryController extends Controller
                 ]);
             }
         }
-
 
         return new DeliveryResource(true, 'Data Delivery Berhasil Ditambahkan!', $delivery);
     }
@@ -276,10 +274,10 @@ class DeliveryController extends Controller
     {
         do {
             $confirmation_code = $this->generateConfirmationCode($companyName, $deliveryNumber, $whatsappNumber);
-           
+
             $existingDelivery = Delivery::where('confirmation_code', $confirmation_code)->first();
-        } while ($existingDelivery); 
-    
+        } while ($existingDelivery);
+
         return $confirmation_code;
     }
 

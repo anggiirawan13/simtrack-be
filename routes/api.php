@@ -26,6 +26,7 @@ Route::prefix('/deliveries')->group(function () {
     Route::get('/filter/status', [DeliveryController::class, 'filterByStatus']);
     Route::get('/generate', [DeliveryController::class, 'generateDeliveryNumber']);
     Route::get('/shipper', [DeliveryController::class, 'getByShipper']);
+    Route::post('/check', [DeliveryController::class, 'getByDeliveryNumber']);
 });
 Route::apiResource('/deliveries', DeliveryController::class);
 

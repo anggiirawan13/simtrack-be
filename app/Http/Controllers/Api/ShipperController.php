@@ -7,7 +7,6 @@ use App\Http\Resources\ShipperResource;
 use App\Models\Delivery;
 use App\Models\Shipper;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class ShipperController extends Controller
@@ -116,10 +115,6 @@ class ShipperController extends Controller
     {
         $shipper = Shipper::find($id);
 
-        Log::info($id);
-        Log::info($request->all());
-
-       
         $shipper->update([
             'device_mapping'   => $request->device_mapping,
         ]);

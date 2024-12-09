@@ -13,7 +13,7 @@ class Delivery extends Model
         'delivery_number',
         'company_name',
         'shipper_id',
-        'status',
+        'status_id',
         'delivery_date',
         'receive_date',
         'confirmation_code',
@@ -29,6 +29,11 @@ class Delivery extends Model
     public function shipper()
     {
         return $this->hasOne(Shipper::class, 'id', 'shipper_id');
+    }
+
+    public function status()
+    {
+        return $this->hasOne(DeliveryStatus::class, 'id', 'status_id');
     }
 
 

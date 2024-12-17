@@ -289,12 +289,15 @@ class DeliveryController extends Controller
         $body = 'Tolong kirimkan lokasi terkini untuk resi: ' . implode(', ', $deliveryNumbers);
 
         // Kirim notifikasi ke Firebase menggunakan FirebaseService
-        $response = $this->firebaseService->sendNotification(
-            $tokens, // Firebase Device Tokens
-            $title,
-            $body,
-            ['delivery_numbers' => $deliveryNumbers] // Data tambahan untuk payload
-        );
+        $firebaseResponses = [];
+        foreach ($tokens as $token) {
+            $response = $this->firebaseService->sendNotification(
+                $token, // Firebase Device Token
+                $title,
+                $body
+            );
+            $firebaseResponses[] = $response;  // Menyimpan respons untuk setiap pengiriman
+        }
 
         $deliveries = Delivery::with(['recipient.address', 'history', 'shipper'])
             ->whereIn('delivery_number', $deliveryNumbers)
@@ -305,7 +308,7 @@ class DeliveryController extends Controller
             'success' => true,
             'message' => 'Data Deliveries',
             'data' => $deliveries,
-            'firebase_response' => $response,
+            'firebase_response' => $firebaseResponses,
         ]);
     }
 

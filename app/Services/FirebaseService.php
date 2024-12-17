@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class FirebaseService
 {
-    protected $firebaseUrl = 'POST https://fcm.googleapis.com/v1/projects/simtrack-mobile/messages:send';
+    protected $firebaseUrl = 'https://fcm.googleapis.com/v1/projects/simtrack-mobile/messages:send';
     protected $serverKey;
 
     public function __construct()
@@ -28,23 +29,27 @@ class FirebaseService
      * @param array|null $data Data tambahan opsional
      * @return mixed
      */
-    public function sendNotification(array $tokens, string $title, string $body, array $data = null)
+    public function sendNotification($token, string $title, string $body)
     {
+        // Prepare the payload for the notification
         $payload = [
-            'registration_ids' => $tokens,
-            'notification' => [
-                'title' => $title,
-                'body' => $body,
-                'sound' => 'default',
-            ],
-            'data' => $data ?? [],
+            'message' => [
+                'token' => $token,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body
+                ]
+            ]
         ];
 
+        // Send the notification via Firebase Cloud Messaging
         $response = Http::withHeaders([
-            'Authorization' => 'key=' . $this->serverKey,
+            'Authorization' => 'Bearer ' . $this->serverKey,  // Use 'key=' for Firebase Cloud Messaging
             'Content-Type' => 'application/json',
-        ])->post($this->firebaseUrl, $payload);
+        ])->post($this->firebaseUrl, $payload);  // Send the POST request to FCM
 
+        // Return the JSON response from Firebase
         return $response->json();
     }
+
 }

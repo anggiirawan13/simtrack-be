@@ -50,7 +50,7 @@ class DeliveryController extends Controller
             'delivery_number' => 'required|string',
             'company_name' => 'required|string',
             'shipper_id' => 'required|integer',
-            'status' => 'required|string',
+            'status_id' => 'required|integer',
             'delivery_date' => 'required',
             'receive_date' => 'nullable',
             'confirmation_code' => 'nullable',
@@ -67,7 +67,7 @@ class DeliveryController extends Controller
             'delivery_number' => $request->delivery_number,
             'company_name' => $request->company_name,
             'shipper_id' => $request->shipper_id,
-            'status' => $request->status,
+            'status_id' => $request->status_id,
             'delivery_date' => \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->delivery_date)->format('Y-m-d'),
             'receive_date' => $request->receive_date
                 ? \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->receive_date)->format('Y-m-d')
@@ -124,7 +124,7 @@ class DeliveryController extends Controller
             'delivery_number' => 'required|string',
             'company_name' => 'required|string',
             'shipper_id' => 'required|integer',
-            'status' => 'required|string',
+            'status_id' => 'required|integer',
             'delivery_date' => 'required|date',
             'receive_date' => 'nullable|date',
             'confirmation_code' => 'required|string',
@@ -140,7 +140,7 @@ class DeliveryController extends Controller
             'delivery_number' => $request->delivery_number,
             'company_name' => $request->company_name,
             'shipper_id' => $request->shipper_id,
-            'status' => $request->status,
+            'status_id' => $request->status_id,
             'delivery_date' => \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->delivery_date)->format('Y-m-d'),
             'receive_date' => $request->receive_date
                 ? \Carbon\Carbon::createFromFormat('M j, Y H:i:s', $request->receive_date)->format('Y-m-d')
@@ -196,7 +196,7 @@ class DeliveryController extends Controller
 
 
         if ($q) {
-            $query->where('status', $q);
+            $query->where('status_id', $q);
         }
 
 

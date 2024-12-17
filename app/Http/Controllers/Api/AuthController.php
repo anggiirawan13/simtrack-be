@@ -15,7 +15,7 @@ class AuthController extends Controller {
     {
         $credentials = $request->only('username', 'password');
 
-        $user = User::with('shipper')->where('username', $credentials['username'])->first();
+        $user = User::with(['shipper', 'role', 'address'])->where('username', $credentials['username'])->first();
 
         if (!$user) {
             return new ApiResource([

@@ -17,10 +17,9 @@ class ShipperSeeder extends Seeder
 
         $faker = Faker::create();
 
-        foreach (range(1, 33) as $index) {
+        foreach (range(1, 4) as $index) {
             DB::table('shippers')->insert([
                 'user_id' => $index, 
-                'device_mapping' => $faker->uuid(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

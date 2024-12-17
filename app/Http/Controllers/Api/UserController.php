@@ -84,7 +84,7 @@ class UserController extends Controller
 
     public function show($id)
     {
-        $user = User::with('address')->find($id);
+        $user = User::with(['address', 'role'])->find($id);
 
         return new UserResource(true, 'Detail Data User!', $user);
     }

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Crypt;
 
 class UserSeeder extends Seeder
@@ -18,8 +17,17 @@ class UserSeeder extends Seeder
             'fullname' => 'Administrator One',
             'username' => 'administrator1',
             'password' => Crypt::encrypt('admin1@1234'),
-            'device_mapping' => '1',
-            'role' => 'Admin',
+            'role_id' => 1,
+            'address_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'fullname' => 'Commissioner One',
+            'username' => 'commissioner1',
+            'password' => Crypt::encrypt('commissioner1@1234'),
+            'role_id' => 2,
             'address_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
@@ -29,8 +37,7 @@ class UserSeeder extends Seeder
             'fullname' => 'Director One',
             'username' => 'director1',
             'password' => Crypt::encrypt('director1@1234'),
-            'device_mapping' => '1',
-            'role' => 'Director',
+            'role_id' => 3,
             'address_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
@@ -40,27 +47,10 @@ class UserSeeder extends Seeder
             'fullname' => 'Shipper One',
             'username' => 'shipper1',
             'password' => Crypt::encrypt('shipper1@1234'),
-            'device_mapping' => '1',
-            'role' => 'Shipper',
+            'role_id' => 4,
             'address_id' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
-        $faker = Faker::create();
-
-       
-        foreach (range(1, 30) as $index) {
-            DB::table('users')->insert([
-                'password' => Crypt::encrypt('password'), 
-                'fullname' => $faker->name,
-                'username' => $faker->unique()->userName,
-                'device_mapping' => '1',
-                'role' => 'Shipper', 
-                'address_id' => 1, 
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
     }
 }

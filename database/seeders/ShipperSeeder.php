@@ -17,7 +17,6 @@ class ShipperSeeder extends Seeder
 
         $faker = Faker::create();
 
-       
         foreach (range(1, 33) as $index) {
             DB::table('shippers')->insert([
                 'user_id' => $index, 

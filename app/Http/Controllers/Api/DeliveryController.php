@@ -8,11 +8,19 @@ use App\Models\Address;
 use App\Models\Delivery;
 use App\Models\DeliveryRecipient;
 use App\Models\DeliveryHistoryLocation;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
 {
+    protected $firebaseService;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->firebaseService = $firebaseService;
+    }
+    
     public function index(Request $request)
     {
         $q = $request->query('q');
@@ -248,27 +256,59 @@ class DeliveryController extends Controller
 
     public function getByDeliveryNumber(Request $request)
     {
-
+        // Ambil daftar nomor pengiriman dari input
         $deliveryNumbers = $request->input('delivery.*.number');
 
-
+        // Validasi input
         if (empty($deliveryNumbers)) {
             return response()->json(['message' => 'No delivery numbers provided'], 400);
         }
 
-
-        $deliveries = Delivery::with('recipient.address')
+        // Ambil data pengiriman berdasarkan nomor
+        $deliveries = Delivery::with(['recipient.address', 'history', 'shipper'])
             ->whereIn('delivery_number', $deliveryNumbers)
             ->get();
 
-
+        // Jika tidak ditemukan pengiriman
         if ($deliveries->isEmpty()) {
             return response()->json(['message' => 'No deliveries found'], 404);
         }
 
+        // Ambil semua token device dari shipper
+        $tokens = $deliveries->map(function ($delivery) {
+            return $delivery->shipper->device_mapping ?? null;
+        })->filter()->values()->toArray(); // Hapus nilai null dan reset index
 
-        return new DeliveryResource(true, 'Data Deliveries', $deliveries);
+        // Jika tidak ada token yang valid
+        if (empty($tokens)) {
+            return response()->json(['message' => 'No valid Firebase tokens found'], 404);
+        }
+
+        // Pesan notifikasi
+        $title = 'Request Location';
+        $body = 'Tolong kirimkan lokasi terkini untuk resi: ' . implode(', ', $deliveryNumbers);
+
+        // Kirim notifikasi ke Firebase menggunakan FirebaseService
+        $response = $this->firebaseService->sendNotification(
+            $tokens, // Firebase Device Tokens
+            $title,
+            $body,
+            ['delivery_numbers' => $deliveryNumbers] // Data tambahan untuk payload
+        );
+
+        $deliveries = Delivery::with(['recipient.address', 'history', 'shipper'])
+            ->whereIn('delivery_number', $deliveryNumbers)
+            ->get();
+
+        // Return respons dengan data pengiriman
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Deliveries',
+            'data' => $deliveries,
+            'firebase_response' => $response,
+        ]);
     }
+
 
     private function generateUniqueConfirmationCode($companyName, $deliveryNumber, $whatsappNumber)
     {

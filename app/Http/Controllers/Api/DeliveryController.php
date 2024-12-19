@@ -96,15 +96,20 @@ class DeliveryController extends Controller
         ]);
 
 
-        if ($request->history != null) {
-            foreach ($request->history as $location) {
-                DeliveryHistoryLocation::create([
-                    'delivery_number' => $delivery->delivery_number,
-                    'latitude' => $location['latitude'],
-                    'longitude' => $location['longitude'],
-                ]);
-            }
-        }
+        // if ($request->history != null) {
+        //     foreach ($request->history as $location) {
+        //         DeliveryHistoryLocation::create([
+        //             'delivery_number' => $delivery->delivery_number,
+        //             'latitude' => $location['latitude'],
+        //             'longitude' => $location['longitude'],
+        //         ]);
+        //     }
+        // }
+        DeliveryHistoryLocation::create([
+            'delivery_number' => $delivery->delivery_number,
+            'latitude' => '-6.211077645077675',
+            'longitude' => '106.59491841349342',
+        ]);
 
         return new DeliveryResource(true, 'Data Delivery Berhasil Ditambahkan!', $delivery);
     }
@@ -112,7 +117,7 @@ class DeliveryController extends Controller
 
     public function show($id)
     {
-        $delivery = Delivery::with('recipient')->with('recipient.address')->find($id);
+        $delivery = Delivery::with(['recipient', 'shipper', 'status', 'history'])->with('recipient.address')->find($id);
 
         return new DeliveryResource(true, 'Detail Data Delivery!', $delivery);
     }
@@ -194,7 +199,6 @@ class DeliveryController extends Controller
 
         $query = Delivery::with(['shipper.user']);
 
-
         if ($q) {
             $query->where('status_id', $q);
         }
@@ -274,41 +278,28 @@ class DeliveryController extends Controller
             return response()->json(['message' => 'No deliveries found'], 404);
         }
 
-        // Ambil semua token device dari shipper
-        $tokens = $deliveries->map(function ($delivery) {
-            return $delivery->shipper->device_mapping ?? null;
-        })->filter()->values()->toArray(); // Hapus nilai null dan reset index
+        // Loop melalui setiap pengiriman dan kirim notifikasi satu per satu
+        foreach ($deliveries as $delivery) {
+            $token = $delivery->shipper->device_mapping ?? null;
 
-        // Jika tidak ada token yang valid
-        if (empty($tokens)) {
-            return response()->json(['message' => 'No valid Firebase tokens found'], 404);
-        }
+            // Lewati jika token tidak valid
+            if (!$token) {
+                continue;
+            }
 
-        // Pesan notifikasi
-        $title = 'Request Location';
-        $body = 'Tolong kirimkan lokasi terkini untuk resi: ' . implode(', ', $deliveryNumbers);
-
-        // Kirim notifikasi ke Firebase menggunakan FirebaseService
-        $firebaseResponses = [];
-        foreach ($tokens as $token) {
-            $response = $this->firebaseService->sendNotification(
+            // Kirim notifikasi ke Firebase menggunakan FirebaseService
+            $this->firebaseService->sendNotification(
                 $token, // Firebase Device Token
-                $title,
-                $body
+                'Customer Check Order', // Judul
+                 $delivery->delivery_number // Isi notifikasi
             );
-            $firebaseResponses[] = $response;  // Menyimpan respons untuk setiap pengiriman
         }
 
-        $deliveries = Delivery::with(['recipient.address', 'history', 'shipper'])
-            ->whereIn('delivery_number', $deliveryNumbers)
-            ->get();
-
-        // Return respons dengan data pengiriman
+        // Return respons berhasil
         return response()->json([
             'success' => true,
-            'message' => 'Data Deliveries',
+            'message' => 'Notifikasi telah dikirim',
             'data' => $deliveries,
-            'firebase_response' => $firebaseResponses,
         ]);
     }
 
@@ -332,5 +323,16 @@ class DeliveryController extends Controller
         $deliveryPrefix = substr($deliveryNumber, 0, 2);
 
         return strtoupper(string: $deliveryPrefix . $companyPrefix . $whatsappPrefix);
+    }
+
+    public function updateLocation(Request $request)
+    {
+        DeliveryHistoryLocation::create([
+            'delivery_number' => $request->delivery_number,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+        ]);
+
+        return new DeliveryResource(true, 'Data Delivery History Location Berhasil Ditambahkan!', null);
     }
 }

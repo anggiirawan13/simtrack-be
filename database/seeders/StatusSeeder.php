@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Faker\Factory as Faker;
 
 class StatusSeeder extends Seeder
 {
@@ -14,15 +12,15 @@ class StatusSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('delivery_status')->insert([
+        DB::table('delivery_statuses')->insert([
             'status' => 'DIPROSES',
         ]);
 
-        DB::table('delivery_status')->insert([
+        DB::table('delivery_statuses')->insert([
             'status' => 'DIKIRIM',
         ]);
 
-        DB::table('delivery_status')->insert([
+        DB::table('delivery_statuses')->insert([
             'status' => 'DITERIMA',
         ]);
     }

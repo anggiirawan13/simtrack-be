@@ -27,7 +27,9 @@ Route::prefix('/deliveries')->group(function () {
     Route::get('/generate', [DeliveryController::class, 'generateDeliveryNumber']);
     Route::get('/shipper', [DeliveryController::class, 'getByShipper']);
     Route::post('/check', [DeliveryController::class, 'getByDeliveryNumber']);
+    Route::post('/update/location', [DeliveryController::class, 'updateLocation']);
 });
+
 Route::apiResource('/deliveries', DeliveryController::class);
 
 Route::post('/auth/login', [AuthController::class, 'login']);

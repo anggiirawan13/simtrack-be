@@ -19,7 +19,6 @@ class ShipperController extends Controller
 
        
         $query = Shipper::with('user');
-
        
         if ($q) {
             $query->whereHas('user', function($subQuery) use ($q) {

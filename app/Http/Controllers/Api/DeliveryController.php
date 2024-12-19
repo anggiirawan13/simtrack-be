@@ -117,7 +117,18 @@ class DeliveryController extends Controller
 
     public function show($id)
     {
-        $delivery = Delivery::with(['recipient', 'shipper', 'status', 'history'])->with('recipient.address')->find($id);
+        $delivery = Delivery::with([
+            'recipient',
+            'recipient.address',
+            'shipper',
+            'status'
+        ])->find($id);
+
+        if ($delivery) {
+            // Ambil satu data `history` terakhir berdasarkan created_at desc
+            $latestHistory = $delivery->history()->orderBy('created_at', 'desc')->first();
+            $delivery->setRelation('history', $latestHistory); // Set `history` sebagai objek tunggal
+        }
 
         return new DeliveryResource(true, 'Detail Data Delivery!', $delivery);
     }

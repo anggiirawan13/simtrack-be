@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 
 namespace App\Http\Controllers;
 
+use App\Models\Delivery;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 
@@ -36,30 +37,28 @@ class ResiController extends Controller
 {
     public function show($noResi)
     {
-        try {
-            // Inisialisasi Guzzle Client
-            $client = new Client();
-
-            // Panggil API
-            $response = $client->get('http://localhost:8000/api/deliveries/' . $noResi);
-
-            // Decode respons JSON
-            $data = json_decode($response->getBody()->getContents(), true);
-
-            // Cek apakah request sukses
-            if ($data['success']) {
-                $resi = $data['data']; // Ambil data dari respons API
-                return view('resi.show', compact('resi')); // Kirim data ke view
-            } else {
-                return redirect()->back()->withErrors(['error' => 'Failed to fetch delivery data: ' . $e->getMessage()]);
-            }
-        } catch (\Exception $e) {
-            // Tangani error jika API gagal dipanggil
-            return redirect()->back()->withErrors(['error' => 'Failed to fetch delivery data: ' . $e->getMessage()]);
-        }
+        $resi = $this->getDetailOrder($noResi);
+    
+        return view('resi.show', compact('resi'));
     }
+    
+    public function getDetailOrder($id)
+    {
+        $delivery = Delivery::with([
+            'recipient',
+            'recipient.address',
+            'shipper',
+            'status'
+        ])->find($id);
+    
+        if ($delivery) {
+            $latestHistory = $delivery->history()->orderBy('created_at', 'desc')->first();
+            $delivery->setRelation('history', $latestHistory);
+        }
+    
+        return $delivery;
+    }
+    
 }
 
-
-// app/Http/Controllers/ResiController.php
 

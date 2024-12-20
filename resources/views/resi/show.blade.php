@@ -13,14 +13,14 @@
         <!-- Flex Container for Details and Delivered Stamp -->
         <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="space-y-4 md:w-3/5">
-                <p class="text-lg"><strong>No Resi:</strong> {{ $resi['delivery_number'] }}</p>
-                <p class="text-lg"><strong>Kota Tujuan:</strong> {{ $resi['recipient']['address']['city'] }}</p>
-                <p class="text-lg"><strong>Perusahaan:</strong> {{ $resi['company_name'] }}</p>
-                <p class="text-lg"><strong>Nama Penerima:</strong> <span id="namaPenerima">{{ $resi['recipient']['name'] }}</span></p>
-                <p class="text-lg"><strong>Tanggal Pengiriman:</strong> {{ $resi['delivery_date'] }}</p>
-                <p class="text-lg"><strong>Tanggal Diterima:</strong> {{ $resi['receive_date'] ?? 'Belum diterima' }}</p>
-                <p class="text-lg"><strong>Status:</strong> <span id="resiStatus" class="font-semibold">{{ $resi['status']['status'] }}</span></p>
-            </div>            
+                <p class="text-lg"><strong>No Resi:</strong> {{ $resi->delivery_number }}</p>
+                <p class="text-lg"><strong>Kota Tujuan:</strong> {{ $resi->recipient->address->city }}</p>
+                <p class="text-lg"><strong>Perusahaan:</strong> {{ $resi->company_name }}</p>
+                <p class="text-lg"><strong>Nama Penerima:</strong> <span id="namaPenerima">{{ $resi->recipient->name }}</span></p>
+                <p class="text-lg"><strong>Tanggal Pengiriman:</strong> {{ $resi->delivery_date }}</p>
+                <p class="text-lg"><strong>Tanggal Diterima:</strong> {{ $resi->receive_date ?? 'Belum diterima' }}</p>
+                <p class="text-lg"><strong>Status:</strong> <span id="resiStatus" class="font-semibold">{{ $resi->status->status }}</span></p>
+            </div>                      
 
             <div id="deliveredStamp" class="hidden md:w-2/5 flex justify-center items-center mt-4 md:mt-0">
                 <img src="{{ asset('img/thanks.png') }}" alt="Delivered" class="w-1/2 h-auto">

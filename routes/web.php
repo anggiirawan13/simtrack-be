@@ -8,5 +8,5 @@ Route::get('/', function () {
 });
 
 // routes/web.php
-Route::get('/resi/{noResi}', [ResiController::class, 'show'])->name('resi.show');
-Route::post('/resi/{noResi}/confirm-arrival', [ResiController::class, 'confirmArrival'])->name('resi.confirmArrival');
+Route::get('/resi/{id}', [ResiController::class, 'show'])->name('resi.show');
+Route::post('/resi/{id}/confirm-arrival', [ResiController::class, 'confirmArrival'])->name('resi.confirmArrival');

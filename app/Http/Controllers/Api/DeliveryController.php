@@ -280,7 +280,7 @@ class DeliveryController extends Controller
         }
 
         // Ambil data pengiriman berdasarkan nomor
-        $deliveries = Delivery::with(['recipient.address', 'history', 'shipper'])
+        $deliveries = Delivery::with(['recipient.address', 'history', 'shipper', 'status'])
             ->whereIn('delivery_number', $deliveryNumbers)
             ->get();
 

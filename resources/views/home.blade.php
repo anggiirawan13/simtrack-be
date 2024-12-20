@@ -148,7 +148,7 @@
                             <th class="border border-gray-300 px-2 py-2 text-xs sm:text-sm">No Resi</th>
                             <th class="border border-gray-300 px-2 py-2 text-xs sm:text-sm">Kota Tujuan</th>
                             <th class="border border-gray-300 px-2 py-2 text-xs sm:text-sm">Perusahaan</th>
-                            <th class="border border-gray-300 px-2 py-2 text-xs sm:text-sm">Tanggal Diterima</th>
+                            <th class="border border-gray-300 px-2 py-2 text-xs sm:text-sm">Tanggal Dikirim</th>
                             <th class="border border-gray-300 px-2 py-2 text-xs sm:text-sm">Status</th>
                             <th class="border border-gray-300 px-2 py-2 text-xs sm:text-sm">Aksi</th>
                         </tr>
@@ -292,7 +292,7 @@
                         <td class="border border-gray-300 px-4 py-2">${resi.recipient.address.city}</td>
                         <td class="border border-gray-300 px-4 py-2">${resi.company_name}</td>
                         <td class="border border-gray-300 px-4 py-2">${resi.delivery_date}</td>
-                        <td class="border border-gray-300 px-4 py-2">${resi.status}</td>
+                        <td class="border border-gray-300 px-4 py-2">${resi.status.status}</td>
                         <td class="border border-gray-300 px-4 py-2">
                             <button onclick="openResiDetail(${resi.id})" class="text-blue-500 hover:text-blue-700">Detail</button>
                         </td>
@@ -315,9 +315,8 @@
         }
 
 
-        function openResiDetail(index) {
-            const resi = resiList[index];
-            window.location.href = `/resi/${resi.noResi}`;
+        function openResiDetail(id) {
+            window.location.href = `/resi/${id}`;
         }
     </script>
 

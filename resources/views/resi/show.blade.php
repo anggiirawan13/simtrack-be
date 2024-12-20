@@ -32,9 +32,11 @@
             <button id="confirmArrivalBtn" onclick="showConfirmationPopup()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 w-full sm:w-auto">
                 Confirm Arrival
             </button>
-            <button onclick="openMaps()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto">
+            <button onclick="openMaps({{ $resi->history->longitude ?? 'null' }}, {{ $resi->history->latitude ?? 'null' }})" 
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+                {{ !$resi->history ? 'disabled' : '' }}>
                 Track
-            </button>
+            </button>        
         </div>
 
         <a href="/" class="mt-4 inline-block text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 text-center">Back to Tracking</a>
@@ -131,11 +133,15 @@
         }
 
         // Function to open Google Maps
-        function openMaps() {
-            const latitude = -6.1751;
-            const longitude = 106.8650;
-            const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
-            window.open(url, '_blank');
+        function openMaps(longitude, latitude) {
+            if (longitude && latitude) {
+                // Format URL untuk membuka Google Maps
+                const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                // Buka tab baru dengan URL peta
+                window.open(mapsUrl, '_blank');
+            } else {
+                alert('Longitude dan Latitude tidak tersedia.');
+            }
         }
 
         // Check the status on page load

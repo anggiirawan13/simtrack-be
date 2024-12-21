@@ -12,16 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('shippers', function (Blueprint $table) {
-            $table->id(); // Auto-increment column for id
-            $table->unsignedBigInteger('user_id'); // Unsigned Big Integer for user_id
-            $table->string('device_mapping'); // VARCHAR(255) for device_mapping
-            $table->timestamps(); // Creates both created_at and updated_at columns
+            $table->id();
+            $table->unsignedBigInteger('user_id')->unique()->nullable(false);
+            $table->text('device_mapping')->nullable(true);
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable(false);
+            $table->unsignedBigInteger('updated_by')->nullable(false);
 
-            // Foreign Key Constraint
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
 
-            // Index
-            $table->index('user_id');
+            $table->index(['id', 'user_id']);
         });
     }
 

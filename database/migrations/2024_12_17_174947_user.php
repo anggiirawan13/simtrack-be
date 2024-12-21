@@ -12,34 +12,37 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id(); // Auto-increment column for id
-            $table->text('password'); // Text field for password
-            $table->string('fullname'); // String for fullname
-            $table->string('username')->unique(); // Unique username
-            $table->unsignedBigInteger('role_id'); // Unsigned Big Integer for role_id
-            $table->unsignedBigInteger('address_id'); // Unsigned Big Integer for address_id
-            $table->timestamps(); // Automatically generates created_at and updated_at columns
+            $table->id();
+            $table->string('fullname', 50)->nullable(false);
+            $table->string('username', 15)->unique()->nullable(false);
+            $table->text('password')->nullable(false);
+            $table->unsignedSmallInteger('role_id')->nullable(false);
+            $table->unsignedBigInteger('address_id')->nullable(false);
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable(false);
+            $table->unsignedBigInteger('updated_by')->nullable(false);
 
-            // Foreign Key Constraints
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
+            $table->foreign('role_id')->references('id')->on('roles')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('address_id')->references('id')->on('addresses')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->index(['id', 'fullname', 'username', 'role_id']);
         });
 
-        // Create the password_reset_tokens table
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('username')->primary(); // Primary key on username
-            $table->string('token'); // Token for password reset
-            $table->timestamp('created_at')->nullable(); // Created_at for token expiration
+            $table->string('username')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
         });
 
-        // Create the sessions table
         Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary(); // Primary key for session ID
-            $table->foreignId('user_id')->nullable()->index(); // Foreign key for user_id, nullable for guest users
-            $table->string('ip_address', 45)->nullable(); // IP address field, max length for IPv6
-            $table->text('user_agent')->nullable(); // User agent field to store browser information
-            $table->longText('payload'); // Store session payload
-            $table->integer('last_activity')->index(); // Last activity timestamp
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
         });
     }
 

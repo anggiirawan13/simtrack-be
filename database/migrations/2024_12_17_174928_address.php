@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->string('whatsapp');
-            $table->string('street');
-            $table->string('sub_district');
-            $table->string('district');
-            $table->string('city');
-            $table->string('province');
-            $table->string('postal_code');
+            $table->string('whatsapp', 15)->nullable(false);
+            $table->text('street')->nullable(false);
+            $table->string('sub_district', 50)->nullable(false);
+            $table->string('district', 50)->nullable(false);
+            $table->string('city', 50)->nullable(false);
+            $table->string('province', 50)->nullable(false);
+            $table->string('postal_code', 6)->nullable(false);
         });
     }
 

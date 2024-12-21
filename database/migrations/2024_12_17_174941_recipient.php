@@ -12,16 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('delivery_recipients', function (Blueprint $table) {
-            $table->id(); // Auto-increment column for id
-            $table->string('delivery_number'); // VARCHAR(255) for delivery_number
-            $table->string('name'); // VARCHAR(255) for name
-            $table->unsignedBigInteger('address_id'); // Unsigned Big Integer for address_id
-            $table->timestamps(); // Creates both created_at and updated_at columns
+            $table->id();
+            $table->unsignedBigInteger('delivery_id')->nullable(false);
+            $table->string('recipient_name')->nullable(false);
+            $table->unsignedBigInteger('address_id')->nullable(false);
+            $table->timestamps();
 
-            // Foreign Key Constraints
-            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
+            $table->foreign('address_id')->references('id')->on('addresses')->onUpdate('cascade')->onDelete('cascade');
 
-            // Index
             $table->index('address_id');
         });
     }

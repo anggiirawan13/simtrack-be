@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('delivery_statuses', function (Blueprint $table) {
-            $table->id();
-            $table->string('status');
+            $table->smallIncrements('id')->nullable(false);
+            $table->string('status', 8)->nullable(false);
         });
     }
 

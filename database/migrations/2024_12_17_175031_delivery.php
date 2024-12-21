@@ -12,21 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('deliveries', function (Blueprint $table) {
-            $table->id(); // Auto-increment column for id
-            $table->string('delivery_number'); // VARCHAR(255) for delivery_number
-            $table->string('company_name'); // VARCHAR(255) for company_name
-            $table->unsignedBigInteger('shipper_id'); // Unsigned Big Integer for shipper_id
-            $table->unsignedBigInteger('status_id'); // Unsigned Big Integer for status_id
-            $table->date('delivery_date'); // Date for delivery_date
-            $table->date('receive_date')->nullable(); // Nullable date for receive_date
-            $table->string('confirmation_code'); // VARCHAR(255) for confirmation_code
-            $table->timestamps(); // Creates both created_at and updated_at columns
+            $table->id();
+            $table->string('delivery_number')->unique()->nullable(false);
+            $table->string('company_name')->nullable(false);
+            $table->unsignedBigInteger('shipper_id')->nullable(false);
+            $table->unsignedSmallInteger('status_id')->nullable(false);
+            $table->timestamp('delivery_date')->nullable(false);
+            $table->timestamp('receive_date')->nullable(true);
+            $table->string('confirmation_code', 8)->nullable(false);
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable(false);
+            $table->unsignedBigInteger('updated_by')->nullable(false);
 
-            // Foreign Key Constraints
-            $table->foreign('shipper_id')->references('id')->on('shippers')->onDelete('cascade');
-            $table->foreign('status_id')->references('id')->on('delivery_status')->onDelete('cascade');
+            $table->foreign('shipper_id')->references('id')->on('shippers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('status_id')->references('id')->on('delivery_statuses')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
 
-            // Indexes
             $table->index('status_id');
             $table->index('shipper_id');
         });

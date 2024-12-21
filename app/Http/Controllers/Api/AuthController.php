@@ -7,8 +7,6 @@ use App\Http\Resources\ApiResource;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller {
     public function login(Request $request) 

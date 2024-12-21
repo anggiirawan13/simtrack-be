@@ -90,8 +90,8 @@ class DeliveryController extends Controller
 
 
         DeliveryRecipient::create([
-            'delivery_number' => $delivery->delivery_number,
-            'name' => $request->recipient['name'],
+            'delivery_id' => $delivery->id,
+            'recipient_name' => $request->recipient['recipient_name'],
             'address_id' => $address->id,
         ]);
 
@@ -106,7 +106,7 @@ class DeliveryController extends Controller
         //     }
         // }
         DeliveryHistoryLocation::create([
-            'delivery_number' => $delivery->delivery_number,
+            'delivery_id' => $delivery->id,
             'latitude' => '-6.211077645077675',
             'longitude' => '106.59491841349342',
         ]);
@@ -181,8 +181,8 @@ class DeliveryController extends Controller
 
         $recipient = DeliveryRecipient::findOrFail($request->recipient['id']);
         $recipient->update([
-            'delivery_number' => $delivery->delivery_number,
-            'name' => $request->recipient['name'],
+            'delivery_id' => $delivery->id,
+            'recipient_name' => $request->recipient['recipient_name'],
             'address_id' => $address->id,
         ]);
 
@@ -339,7 +339,7 @@ class DeliveryController extends Controller
     public function updateLocation(Request $request)
     {
         DeliveryHistoryLocation::create([
-            'delivery_number' => $request->delivery_number,
+            'delivery_id' => $request->id,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);

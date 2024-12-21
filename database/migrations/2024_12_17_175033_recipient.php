@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('address_id')->nullable(false);
             $table->timestamps();
 
+            $table->foreign('delivery_id')->references('id')->on('deliveries')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('address_id')->references('id')->on('addresses')->onUpdate('cascade')->onDelete('cascade');
 
             $table->index('address_id');

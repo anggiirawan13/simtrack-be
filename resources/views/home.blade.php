@@ -265,6 +265,7 @@
             const resiTable = document.getElementById("resiTable");
             const resiTableBody = document.getElementById("resiTableBody");
 
+            numberList.delivery = numberList.delivery.filter(item => item.number);
 
             resiTableBody.innerHTML = "";
             const apiUrl = @json(env('API_URL'));

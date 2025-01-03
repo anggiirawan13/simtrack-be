@@ -268,7 +268,8 @@
             numberList.delivery = numberList.delivery.filter(item => item.number);
 
             resiTableBody.innerHTML = "";
-            const apiUrl = @json(env('API_URL'));
+            const envURL = @json(env('API_URL'));
+            const apiUrl = envURL.replace('API_URL=', '')
             fetch(`${apiUrl}/deliveries/check`, {
                     method: "POST",
                     headers: {

@@ -10,7 +10,7 @@ class DeliveryHistoryLocation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'delivery_number',
+        'delivery_id',
         'latitude',
         'longitude'
     ];

@@ -10,7 +10,7 @@ class DeliveryRecipient extends Model
     use HasFactory;
 
     protected $fillable = [
-        'delivery_number',
+        'delivery_id',
         'name',
         'address_id'    
     ];

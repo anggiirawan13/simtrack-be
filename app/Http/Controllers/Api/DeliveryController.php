@@ -153,6 +153,7 @@ class DeliveryController extends Controller
         $delivery = Delivery::findOrFail($id);
 
         $delivery->update([
+            'id' => $id,
             'delivery_number' => $request->delivery_number,
             'company_name' => $request->company_name,
             'shipper_id' => $request->shipper_id,
@@ -302,7 +303,7 @@ class DeliveryController extends Controller
             $this->firebaseService->sendNotification(
                 $token, // Firebase Device Token
                 'Customer Check Order', // Judul
-                 $delivery->delivery_number // Isi notifikasi
+                 $delivery->id . '~' . $delivery->delivery_number // Isi notifikasi
             );
         }
 

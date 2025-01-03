@@ -23,7 +23,7 @@ class Delivery extends Model
 
     public function recipient()
     {
-        return $this->hasOne(DeliveryRecipient::class, 'delivery_number', 'delivery_number');
+        return $this->hasOne(DeliveryRecipient::class, 'delivery_id', 'id');
     }
 
     public function shipper()
@@ -39,6 +39,6 @@ class Delivery extends Model
 
     public function history()
     {
-        return $this->hasMany(DeliveryHistoryLocation::class, 'delivery_number', 'delivery_number');
+        return $this->hasMany(DeliveryHistoryLocation::class, 'delivery_id', 'id');
     }
 }

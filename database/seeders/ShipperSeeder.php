@@ -14,15 +14,12 @@ class ShipperSeeder extends Seeder
      */
     public function run(): void
     {
-
-        $faker = Faker::create();
-
-        foreach (range(1, 4) as $index) {
-            DB::table('shippers')->insert([
-                'user_id' => $index, 
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        DB::table('shippers')->insert([
+            'user_id' => 4, 
+            'created_at' => now(),
+            'created_by' => 1,
+            'updated_at' => now(),
+            'updated_by' => 1
+        ]);
     }
 }

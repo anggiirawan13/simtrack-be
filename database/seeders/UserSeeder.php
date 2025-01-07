@@ -20,7 +20,9 @@ class UserSeeder extends Seeder
             'role_id' => 1,
             'address_id' => 1,
             'created_at' => now(),
+            'created_by' => 1,
             'updated_at' => now(),
+            'updated_by' => 1
         ]);
 
         DB::table('users')->insert([
@@ -30,7 +32,9 @@ class UserSeeder extends Seeder
             'role_id' => 2,
             'address_id' => 1,
             'created_at' => now(),
+            'created_by' => 1,
             'updated_at' => now(),
+            'updated_by' => 1
         ]);
 
         DB::table('users')->insert([
@@ -40,7 +44,9 @@ class UserSeeder extends Seeder
             'role_id' => 3,
             'address_id' => 1,
             'created_at' => now(),
+            'created_by' => 1,
             'updated_at' => now(),
+            'updated_by' => 1
         ]);
 
         DB::table('users')->insert([
@@ -50,7 +56,9 @@ class UserSeeder extends Seeder
             'role_id' => 4,
             'address_id' => 1,
             'created_at' => now(),
+            'created_by' => 1,
             'updated_at' => now(),
+            'updated_by' => 1
         ]);
     }
 }
